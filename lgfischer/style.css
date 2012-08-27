@@ -1,0 +1,394 @@
+/*
+Theme Name: Lgfischer's Theme
+Theme URI: http://leonardofischer.com/
+Description: The theme for Leonardo Garcia Fischer's web site
+Author: lgfischer
+Author URI: http://leonardofischer.com/
+Version: 1.0
+Tags: 
+
+License:
+License URI:
+
+General comments (optional).
+*/
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+	v2.0 | 20110126
+	License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*
+	Lgfischer's stylesheet
+*/
+@font-face {
+	font-family: SansPro;
+	src: url('font-source-sans-pro/SourceSansPro-Regular.ttf');
+}
+@font-face {
+	font-family: Brawler;
+	src: url('font-brawler/Brawler-Regular.ttf');
+}
+
+body {
+	background-color: #303030;
+	background-image: url("px_by_Gre3g.png");
+	background-attachment: fixed;
+	color: #FBFBFB;
+	font-family: "SansPro","Arial","Helvetica";
+	font-size: 16px;
+	line-height: 1.4em;
+	margin-left: 180px;
+	margin-top: 0px;
+	padding-left: 25px;
+	padding-right: 25px;
+	width: 780px;
+}
+h1, h2, h3 {
+	font-family: "Brawler", "Times";
+}
+pre {
+	border-radius: 3px;
+	display: block;
+	font-family: monospace;
+	font-size: 15px;
+	line-height: 1.2em;
+	margin: 1em 0px;
+	white-space: pre;
+}
+header {
+	font-size: 15px;
+	height: 100%;
+	left:0px;
+	line-height: 1.2em;
+	position: fixed;
+	top:0px;
+	width: 180px;
+	padding-top: 30px;
+	padding-left: 2px;
+	padding-right: 2px;
+	text-shadow: 1px 1px black;
+}
+header h1 {
+	font-size: 32px;
+	line-height: 1.1em;
+	margin-left: 5px;
+	margin-bottom: 30px;
+	text-shadow: 1px 1px 2px black;
+	letter-spacing: -2px;
+}
+header h1 a {
+	color: inherit;
+	text-decoration: none;
+}
+header h1 a:hover {
+	color: inherit;
+	text-decoration: underline;
+}
+header a {
+	color: inherit;
+	font-weight: bold;
+	text-decoration: none;
+}
+header a:hover {
+	text-decoration: underline;
+}
+header ul li {
+	list-style-image: url("bullet.png");
+	margin-left: 16px;
+}
+article {
+	color: #222;
+	background-color: #FBFBFB;
+	background-image: url("light_wool.png");
+	padding: 30px;
+	position: relative;
+	box-shadow: 0 0 20px black;
+	margin-bottom: 30px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+article > * {
+	margin-bottom: 15px;
+	margin-top: 0;
+}
+article h1 {
+	text-shadow: 1px 1px 0 white;
+	font-size: 38px;
+	font-weight: bold;
+	line-height: 1.3em;
+	margin-bottom: 25px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0;
+	max-width: 80%;
+	text-align: center;
+}
+article h1 > a {
+	color: inherit;
+	font-size: 38px;
+	font-weight: bold;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: 1px 1px 0 white;
+}
+article h1 > a:hover {
+	text-decoration: underline;
+}
+.date {
+	display: block;
+	position: absolute;
+	right: 30px;
+	top: 0px;
+}
+.date span:nth-child(1) {
+	background: #222;
+	border-left: 1px solid #222;
+	border-right: 1px solid #222;
+	color: white;
+	display: block;
+	font-size: 40px;
+	height: 40px;
+	line-height: 1em;
+	position: absolute;
+	right: 0px;
+	text-align: center;
+	text-shadow: none;
+	top: 0px;
+	width: 50px;
+}
+.date span:nth-child(2) {
+	background: white;
+	border-left: 1px solid #222;
+	border-right: 1px solid #222;
+	color: #222;
+	display: block;
+	font-size: 22px;
+	height: 24px;
+	line-height: 1em;
+	position: absolute;
+	right: 0px;
+	text-align: center;
+	text-shadow: none;
+	top: 40px;
+	width: 50px;
+}
+.date span:nth-child(3) {
+	background: #222;
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+	border-left: 1px solid #222;
+	border-right: 1px solid #222;
+	color: white;
+	display: block;
+	font-size: 30px;
+	height: 30px;
+	line-height: 1em;
+	position: absolute;
+	right: 0px;
+	text-align: center;
+	text-shadow: none;
+	top: 64px;
+	width: 50px;
+}
+article h2 {
+	font-size: 26px;
+	font-weight: bold;
+	margin-top: 40px;
+}
+article h3 {
+	font-size: 20px;
+	font-weight: bold;
+	margin-top: 20px;
+}
+article figure {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+article figure img {
+	background: #FFFDF0;
+	border: solid 1px #CCC;
+	border-radius: 3px;
+	box-shadow: 2px 2px 2px #888;
+	padding: 5px;
+}
+article > ul, article > ol {
+	padding-left: 40px;
+}
+article > ul {
+	list-style-type: circle;
+}
+article > ol {
+	list-style-type: lower-roman;
+}
+article li {
+	margin-bottom: 10px;
+}
+article strong {
+	font-weight: bold;
+}
+article .alert{
+	background: #FFFFAE;
+	border-color: #FFD800;
+	border-radius: 6px;
+	border-style: solid;
+	border-width: 1px;
+	padding: 0.6em 1em 0.6em 1em;
+}
+
+article h2 a, article h3 a {
+	color: inherit;
+	text-decoration: none;
+}
+.comments {
+	padding-left: 0;
+	list-style-type: none;
+}
+.comments li, #respond #commentform {
+	border: 1px solid #888;
+	border-radius: 3px;
+	display: block;
+	background-color: #EEE;
+	padding: 10px;
+	position: relative;
+}
+.comments .avatar, #respond .avatar {
+	background: #FFFDF0;
+	border: solid 1px #CCC;
+	border-radius: 3px;
+	box-shadow: 2px 2px 2px #888;
+	float: left;
+	margin-right: 12px;
+	padding: 5px;
+}
+.comments .author, #respond .logged-in-as {
+	font-family: "Brawler", "Times";
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+.comments .author a, #respond .logged-in-as a {
+	color: inherit;
+}
+.comments .message {
+	margin-left: 65px;
+}
+.comments .edit a {
+	background: #222;
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+	border-style: solid;
+	border-width: 0px 1px 1px 1px;
+	color: #FBFBFB;
+	display: block;
+	font-size: 12px;
+	line-height: 1em;
+	padding: 3px 5px 2px 5px;
+	position: absolute;
+	right: 10px;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: none;
+	top: 0px;
+}
+.comments .edit a:hover {
+	background: #FBFBFB;
+	color: #222;
+}
+
+#respond p {
+	margin-left: 65px;
+	margin-bottom: 8px;
+}
+#respond label {
+	display: inline-block;
+	width: 80px;
+}
+#respond label[for=comment] {
+	display: block;
+}
+#respond #comment {
+	border-radius: 3px;
+	border-color: #888;
+	font-family: inherit;
+	font-size: inherit;
+	padding: 10px;
+	width: 610px;
+	max-width: 610px;
+}
+#respond .form-allowed-tags {
+	font-size: 14px;
+	line-height: 1.2em;
+}
+#respond #submit {
+	padding: 6px 10px;
+	font-family: "Brawler", "Times";
+	font-size: 16px;
+	font-weight: bold;
+}
+#respond #reply-title {
+	margin-bottom: 15px;
+}
+.navigation {
+	background-color: #FBFBFB;
+	background-image: url("light_wool.png");
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	color: #222;
+	font-family: "Brawler", "Times";
+	font-weight: bold;
+	margin-bottom: 0;
+	padding: 10px;
+}
+.navigation a {
+	color: inherit;
+	font-weight: bold;
+}
+.footer {
+	background: #DAE0E5;
+	margin-bottom: 0;
+}

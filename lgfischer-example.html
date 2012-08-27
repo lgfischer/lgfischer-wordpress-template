@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leonardo Garcia Fischer</title>
+	<link rel="stylesheet" type="text/css" href="lgfischer/style.css" />
+	<link rel="stylesheet" type="text/css" href="lgfischer/google-code-prettify/prettify.css" />
+	<script type="text/javascript" src="lgfischer/jquery-1.8.0.min.js"></script>
+	<script type="text/javascript" src="lgfischer/google-code-prettify/prettify.js"></script>
+	<script type="text/javascript" src="lgfischer/lgfischer.js"></script>
+</head>
+<body>
+	<header>
+		<h1><a href="#">Leonardo Garcia Fischer</a></h1>
+		<ul>
+			<li><a href="#">Blog</a></li>
+			<li><a href="#">Author</a></li>
+			<li>Recomendations</li>
+		</ul>
+	</header>
+	<article>
+		<h1><a href="#">How to (legally) steal the look and feel of Twitter</a></h1>
+		<span title="30 Sep 2004" class="date"><span>30</span><span>Sep</span><span>'04</span></span>
+
+<figure>
+<a href="http://www.flickr.com/photos/afagen/3205898987" title="Thanks afagen for the photo"><img src="http://4.bp.blogspot.com/-IY6RpgfSOlE/TyQZ2wrbxyI/AAAAAAAAAnc/erw8eq7IjQM/s1600/times_square.jpg" /></a>
+</figure>
+
+<p>Hi,</p>
+
+<p>
+No, this isn't another tutorial on how to create Android Widgets. For this, I recommend you <a href="http://developer.android.com/guide/topics/appwidgets/index.html">the Android SDK</a> or <a href="http://www.google.com/search?q=How+to+develop+Android+Widgets">Google</a>. This post is on how to create a simple app that lets the user add and remove widgets, like the Android Home Screen does.
+</p>
+
+<p>
+I decided to write this one because I couldn't find anything on the web saying how to do this. I found how to create this example looking at the <a href="https://github.com/android/platform_packages_apps_launcher">Android Home Screen Source Code (AHSSC)</a>. So, if you already did this, you may find some variable names similar. You can use this as trails to look yourself on the AHSSC  ツ
+</p>
+
+<h2>Initialization</h2>
+
+<p>
+You start by creating two objects. The first is an <a href="http://developer.android.com/reference/android/appwidget/AppWidgetManager.html">AppWidgetManager</a>, which will give you the data you need about installed widgets. The second one is an <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHost.html">AppWidgetHost</a>, which will keep in memory your widget instances. Latter, your app will handle only the view that will draw the widget
+</p>
+<pre><code>
+    mAppWidgetManager = AppWidgetManager.getInstance(this);
+    mAppWidgetHost = new AppWidgetHost(this, R.id.APPWIDGET_HOST_ID);
+</code></pre>
+
+<h2>Selecting the Widget</h2>
+
+<p>
+You start by asking to the AppWidgetHost to allocate resources for a widget instance. It will return an ID for that. Then, you need to start an activity to let the user select which widget he wants to add to your app. You need to give this ID to the activity.
+</p>
+
+<pre><code>
+	void selectWidget() {
+	    int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
+	    Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
+	    pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+	    addEmptyData(pickIntent);
+	    startActivityForResult(pickIntent, R.id.REQUEST_PICK_APPWIDGET);
+	}
+	void addEmptyData(Intent pickIntent) {
+		ArrayList<AppWidgetProviderInfo> customInfo = new ArrayList<AppWidgetProviderInfo>();
+		pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_INFO, customInfo);
+		ArrayList<Bundle> customExtras = new ArrayList<Bundle>();
+		pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, customExtras);
+	};
+</code></pre>
+
+<p>
+Unfortunately, any kind of software has bugs, and here is one of the Android SDK. The Widget API supports that you merge custom widgets of your application with the installed ones. But if you don't add anything, the Activity that shows the list of widgets to the user crashes with a NullPointerException. The <code>addEmptyData()</code> method above adds some dummy data to avoid this bug. More on this bug <a href="http://code.google.com/p/android/issues/detail?id=4272">here</a>. If you want to add a custom widget, start looking at <a href="https://github.com/android/platform_packages_apps_launcher/blob/eclair-sholes-release2/src/com/android/launcher/Launcher.java#L1990">this point of the AHSSC</a>.
+</p>
+
+<h2>Configuring the Widget</h2>
+
+<p>
+If the user successfully selects a widget from the list (he didn't pressed "back"), it will return an OK to you as an activity result. The data for this result contains the widget ID. Use it to retrieve the <a href="http://developer.android.com/reference/android/appwidget/AppWidgetProviderInfo.html">AppWidgetProviderInfo</a> to check if the widget requires any configuration (some widgets does need). If it requires, you need to launch the activity to configure the widget. If not, jump to the next step.
+</p>
+
+
+<pre></code>
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK ) {
+			if (requestCode == REQUEST_PICK_APPWIDGET) {
+				configureWidget(data);
+			}
+			else if (requestCode == REQUEST_CREATE_APPWIDGET) {
+				createWidget(data);
+			}
+		}
+		else if (resultCode == RESULT_CANCELED && data != null) {
+			int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+			if (appWidgetId != -1) {
+				mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+			}
+		}
+	}
+
+	private void configureWidget(Intent data) {
+		Bundle extras = data.getExtras();
+		int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+		AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+		if (appWidgetInfo.configure != null) {
+			Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+			intent.setComponent(appWidgetInfo.configure);
+			intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+			startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
+		} else {
+			createWidget(data);
+		}
+	}
+</code></pre>
+
+<h2>Creating and Adding it to Your Views</h2>
+
+<p>
+Now is time to create the widget itself. You will use the Widget ID and the AppWidgetProviderInfo to ask to the AppWidgetHost "<i>could you please create a view of this widget for me?</i>". It will return an <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHostView.html">AppWidgetHostView</a> which is a derived class from View. This one you can handle as any other view from the Framework. But don't forget to set the Widget ID and Widget Info on the view (I don't know why the AppWidgetHost didn't when creating the view).
+</p>
+
+<pre><code>
+	public void createWidget(Intent data) {
+		Bundle extras = data.getExtras();
+		int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+		AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+		AppWidgetHostView hostView = mAppWidgetHost.createView(this, appWidgetId, appWidgetInfo);
+		hostView.setAppWidget(appWidgetId, appWidgetInfo);
+		layout.addView(hostView);
+	}
+</code></pre>
+
+<h2>Updating</h2>
+
+<p>
+The widget is now working, but is not being updated by your app. If the widget is a clock, it will be stuck at the time you added it. To register the widget to receive the events it needs, call <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHost.html#startListening%28%29">startListening()</a> on the AppWidgetHost. To avoid wasting battery with unnecessary updates while your app is not visible, call it during the <a href="http://developer.android.com/reference/android/app/Activity.html#onStart%28%29">onStart()</a> method of your activity, and call <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHost.html#stopListening%28%29">stopListening()</a> during the <a href="http://developer.android.com/reference/android/app/Activity.html#onStop%28%29">onStop()</a> method.
+</p>
+
+<pre><code>
+	@Override
+	protected void onStart() {
+		super.onStart();
+		mAppWidgetHost.startListening();
+	}
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mAppWidgetHost.stopListening();
+	}
+</code></pre>
+
+<h2>Releasing the Widget</h2>
+
+<p>
+The widget should be working now. But if you want to remove the widget, you need to ask to the AppWidgetHost to release it. If you do not release it, you'll get a memory leak (your app will consume unnecessary memory). Finally, remove it from your LayoutView.
+</p>
+
+<pre><code>
+	public void removeWidget(AppWidgetHostView hostView) {
+		mAppWidgetHost.deleteAppWidgetId(hostView.getAppWidgetId());
+		layout.removeView(hostView);
+	}
+</code></pre>
+
+<p>
+Note that the widget ID is also deleted during the <code>onActivityResult()</code> method if the user gave up selecting the widget. 
+</p>
+
+<p>
+I hope this can help you develop widget based apps. You can <a href="http://min.us/mcFZ5RvsV#1o">download the full source code for this post here</a> or on <a href="https://github.com/lgfischer/WidgetHostExample">GitHub</a>. There is also <a href="https://github.com/lgfischer/WidgetHostExample/blob/master/build/WidgetHostExample.apk?raw=true">an APK to install on your phone</a> (just make sure <a href="http://stackoverflow.com/questions/8795244/installing-apk-app-on-android-without-market">you can install it</a>).
+</p>
+
+
+
+<h2><a id="comments" href="#comments">Comments</a></h2>
+<ol class="comments">
+						<li id="comment-3">
+				<img alt="" src="http://0.gravatar.com/avatar/41dc3e007986c35dc46763689fa93174?s=40&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D40&amp;r=G" class="avatar avatar-40 photo" height="40" width="40">								<p class="edit"><a class="comment-edit-link" href="http://leonardofischer.com/wp-admin/comment.php?action=editcomment&amp;c=3" title="Edit comment">Edit This</a></p>
+								<p class="author"><a href="http://sevenplusandroid.org" rel="external nofollow" class="url">Thomas Barrasso</a> (<a href="#comment-3" title="">February 18th, 2012</a>)</p>
+				<div class="message"><p>Excellent article, there are plenty of articles written about how to make Android Widgets but not nearly enough about how to host them in your application.</p>
+</div>
+							</li>
+						<li id="comment-4">
+				<img alt="" src="http://0.gravatar.com/avatar/41dc3e007986c35dc46763689fa93174?s=40&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D40&amp;r=G" class="avatar avatar-40 photo" height="40" width="40">								<p class="edit"><a class="comment-edit-link" href="http://leonardofischer.com/wp-admin/comment.php?action=editcomment&amp;c=4" title="Edit comment">Edit This</a></p>
+								<p class="author">Anonymous (<a href="#comment-4" title="">March 15th, 2012</a>)</p>
+				<div class="message"><p>thank you thank you thank you.  This code and information has helped me so much in turning an idea into a project.  I couldn’t find this info anywhere else.</p>
+</div>
+							</li>
+						<li id="comment-5">
+				<img alt="" src="http://0.gravatar.com/avatar/41dc3e007986c35dc46763689fa93174?s=40&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D40&amp;r=G" class="avatar avatar-40 photo" height="40" width="40">								<p class="edit"><a class="comment-edit-link" href="http://leonardofischer.com/wp-admin/comment.php?action=editcomment&amp;c=5" title="Edit comment">Edit This</a></p>
+								<p class="author">Anonymous (<a href="#comment-5" title="">April 3rd, 2012</a>)</p>
+				<div class="message"><p>Hi! can you please tell me how to add a certain widget (like google search) without using the widget picker activity? Thank you!</p>
+</div>
+							</li>
+						<li id="comment-6">
+				<img alt="" src="http://0.gravatar.com/avatar/41dc3e007986c35dc46763689fa93174?s=40&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D40&amp;r=G" class="avatar avatar-40 photo" height="40" width="40">								<p class="edit"><a class="comment-edit-link" href="http://leonardofischer.com/wp-admin/comment.php?action=editcomment&amp;c=6" title="Edit comment">Edit This</a></p>
+								<p class="author">Anonymous (<a href="#comment-6" title="">April 3rd, 2012</a>)</p>
+				<div class="message"><p>If I add it by just specifying an ID I always get errors. </p>
+<p>I also tried<br>ComponentName cn = new ComponentName(getBaseContext(), “com.android.quicksearchbox.SearchWidgetProvider”);<br>   int[] ids = AppWidgetManager.getInstance(getApplicationContext()).getAppWidgetIds (cn);</p>
+<p>…</p>
+</div>
+							</li>
+						<li id="comment-7">
+				<img alt="" src="http://0.gravatar.com/avatar/41dc3e007986c35dc46763689fa93174?s=40&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D40&amp;r=G" class="avatar avatar-40 photo" height="40" width="40">								<p class="edit"><a class="comment-edit-link" href="http://leonardofischer.com/wp-admin/comment.php?action=editcomment&amp;c=7" title="Edit comment">Edit This</a></p>
+								<p class="author"><a href="http://www.blogger.com/profile/03057555747434590870" rel="external nofollow" class="url">Kamran Ahmed Ansari</a> (<a href="#comment-7" title="">July 5th, 2012</a>)</p>
+				<div class="message"><p>That was indeed really very helpful!</p>
+<p>Keep blogging!<br> <img src="http://leonardofischer.com/wp-includes/images/smilies/icon_biggrin.gif" alt=":D" class="wp-smiley"> </p>
+</div>
+							</li>
+					</ol>
+
+
+
+
+
+<div id="respond">
+				<h3 id="reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/hosting-android-widgets-my-appwidgethost-tutorial/#respond" style="display:none;">Cancel reply</a></small></h3>
+									<form action="http://leonardofischer.com/wp-comments-post.php" method="post" id="commentform">
+																			<p class="comment-notes">Your email address will not be published. Required fields are marked <span class="required">*</span></p>							<p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">Website</label><input id="url" name="url" type="text" value="" size="30"></p>
+												<p class="comment-form-comment"><label for="comment">Comment</label><textarea id="comment" name="comment" cols="45" rows="8" aria-required="true"></textarea></p>						<p class="form-allowed-tags">You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:  <code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></p>						<p class="form-submit">
+							<input name="submit" type="submit" id="submit" value="Post Comment">
+							<input type="hidden" name="comment_post_ID" value="5" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+						</p>
+											</form>
+							</div>
+
+
+
+	</article>
+	<div class="navigation">
+		<a href="http://www.leonardofischer.com/page/2/"><span class="meta-nav">&larr;</span> Older posts</a>					</div>
+	<div class="footer">
+	</div>
+</body>
+</html>
