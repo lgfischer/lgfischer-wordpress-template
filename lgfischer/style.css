@@ -81,14 +81,18 @@ body {
 	font-family: "SansPro","Arial","Helvetica";
 	font-size: 16px;
 	line-height: 1.4em;
-	margin-left: 180px;
+	margin-left: auto;
+	margin-right: auto;
 	margin-top: 0px;
 	padding-left: 25px;
 	padding-right: 25px;
 	width: 780px;
 }
-h1, h2, h3 {
+h1, h2, h3, h4, h5, h6 {
 	font-family: "Brawler", "Times";
+}
+a:hover {
+	text-decoration: underline;
 }
 pre {
 	border-radius: 3px;
@@ -126,15 +130,11 @@ header h1 a {
 }
 header h1 a:hover {
 	color: inherit;
-	text-decoration: underline;
 }
 header a {
 	color: inherit;
 	font-weight: bold;
 	text-decoration: none;
-}
-header a:hover {
-	text-decoration: underline;
 }
 header ul li {
 	list-style-image: url("bullet.png");
@@ -167,16 +167,13 @@ article h1 {
 	max-width: 80%;
 	text-align: center;
 }
-article h1 > a {
+article h1 a {
 	color: inherit;
 	font-size: 38px;
 	font-weight: bold;
 	text-align: center;
 	text-decoration: none;
 	text-shadow: 1px 1px 0 white;
-}
-article h1 > a:hover {
-	text-decoration: underline;
 }
 .date {
 	display: block;
@@ -233,6 +230,9 @@ article h1 > a:hover {
 	text-shadow: none;
 	top: 64px;
 	width: 50px;
+}
+article > .author {
+	text-align: center;
 }
 article h2 {
 	font-size: 26px;

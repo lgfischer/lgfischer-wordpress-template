@@ -7,15 +7,16 @@
 					if ( $author_url!='' ) { echo "<a href='". $author_url ."'>" . get_avatar( $comment, 40 ) . "</a>"; }
 					else { echo get_avatar( $comment, 40 ); }
 				?>
-				
 				<?php if (current_user_can( 'edit_comment', $comment->comment_ID )) : ?>
 				<p class="edit"><?php edit_comment_link(); ?></p>
 				<?php endif ?>
 				<p class="author"><?php comment_author_link() ?> (<a href="#comment-<?php comment_ID() ?>" title=""><?php comment_date('F jS, Y') ?></a>)</p>
-				<div class="message"><?php comment_text() ?></div>
-				<?php if ($comment->comment_approved == '0') : ?>
-				<em>Your comment is awaiting moderation.</em>
-				<?php endif; ?>
+				<div class="message">
+					<?php comment_text() ?>
+					<?php if ($comment->comment_approved == '0') : ?>
+					<p class="alert">Your comment is awaiting moderation.</p>
+					<?php endif; ?>
+				</div>
 			</li>
 			<?php endforeach; ?>
 		</ol>
