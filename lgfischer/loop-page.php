@@ -3,7 +3,7 @@
 		<h1><a href="<?php the_permalink(); ?>" title="<?php printf( esc_attr__( '%s (permalink)', 'lgfischer' ), the_title_attribute( 'echo=0' ) ); ?>" rel="bookmark"><?php the_title(); ?></a></h1>
 		<?php the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'lgfischer' ) ); ?>
 	<?php
-		$tags_list = get_the_tag_list( '', ', ' );
+		$tags_list = get_the_tag_list( '', '', '' );
 		if ( $tags_list ):
 	?>
 		<p><?php printf( __( 'Tags: %1$s', 'lgfischer' ), $tags_list ); ?></p>

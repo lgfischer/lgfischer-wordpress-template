@@ -12,5 +12,6 @@ $(document).ready(function(){
 
 	$('.social-wall a').aToolTip({  
 		fixed: true,
+		xOffset: -50,
 	});
 });

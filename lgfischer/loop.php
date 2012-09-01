@@ -5,10 +5,10 @@
 		<p class="author">Written by <?php the_author() ?></p>
 		<?php the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'lgfischer' ) ); ?>
 	<?php
-		$tags_list = get_the_tag_list( '', ', ' );
+		$tags_list = get_the_tag_list( '', '', '' );
 		if ( $tags_list ):
 	?>
-		<h3><?php printf( __( 'Tags: %1$s', 'lgfischer' ), $tags_list ); ?></h3>
+		<p><?php printf( __( 'Tags: %1$s', 'lgfischer' ), $tags_list ); ?></p>
 	<?php endif; ?>
 	<?php if ( !is_singular($post) ): ?>
 		<h3><?php comments_popup_link( 'No comments yet', '1 comment', '% comments', 'comments-link', 'Comments are off for this post'); ?></h3>
