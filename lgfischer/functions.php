@@ -25,9 +25,12 @@
 			$settings_updated = true;
 			$analytics_code = esc_attr($_POST["analytics_code"]);
 			update_option("theme_lgfischer_google_analytics_code", $analytics_code);
+			$disable_line_breaks = esc_attr($_POST["disable_line_breaks"])=='on';
+			update_option("theme_lgfischer_disable_line_breaks", $disable_line_breaks);
 		}
 		else {
 			$analytics_code = get_option("theme_lgfischer_google_analytics_code");
+			$disable_line_breaks = get_option("theme_lgfischer_disable_line_breaks");
 		}
 
 		?>
@@ -45,6 +48,14 @@
 							<input type="text" id="analytics_code" name="analytics_code" value="<?php echo $analytics_code;?>" />
 						</td>
 					</tr>
+					<tr valign="top">
+						<th scope="row">
+							<label for="analytics_code">Disable automatic insertion of &lt;p&gt; and &lt;br&gt; tags:</label>
+						</th>
+						<td>
+							<input type="checkbox" id="disable_line_breaks" name="disable_line_breaks" <?php if($disable_line_breaks) {echo 'checked';};?> />
+						</td>
+					</tr>
 				</table>
 				<p>
 					<input type="submit" value="Save settings" class="button-primary"/>
@@ -52,5 +63,9 @@
 			</form>
 		</div>
 		<?php
+	}
+
+	if( get_option("theme_lgfischer_disable_line_breaks") ) {
+		remove_filter('the_content', 'wpautop');
 	}
 ?>

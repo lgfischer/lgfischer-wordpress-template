@@ -18,6 +18,7 @@ Optional Features
 These features can be configured through the "Admin / Appearance / Lgfischer Settings" menu
 
 - Google Analytics Tracking ID
+- Disable Wordpress automatic addition of &lt;p&gt; and &lt;br&gt; tags
 
 
 
