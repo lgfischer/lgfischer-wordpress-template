@@ -35,3 +35,4 @@ TODO
 - Add "Friends links" support
 - Add nested comments support
 - Add advanced Google Analytics Support (i.e. choose between 'single domain', 'multiple subdomains' and 'multiple top-level domain' options )
+- Add "Page 404"
