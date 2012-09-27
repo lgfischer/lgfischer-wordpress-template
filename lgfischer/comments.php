@@ -32,8 +32,7 @@
 							'<input id="email" name="email" type="text" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' /></p>',
 				'url'    => '<p class="comment-form-url"><label for="url">' . __( 'Website', 'domainreference' ) . '</label>' .
 							'<input id="url" name="url" type="text" value="' . esc_attr( $commenter['comment_author_url'] ) . '" size="30" /></p>',
-			); 
-
+			);
 			
 			global $current_user;
 			get_currentuserinfo();

@@ -8,6 +8,7 @@
 	<script type="text/javascript" src="<?php bloginfo('template_directory'); ?>/jquery-1.8.0.min.js"></script>
 	<script type="text/javascript" src="<?php bloginfo('template_directory'); ?>/google-code-prettify/prettify.js"></script>
 	<script type="text/javascript" src="<?php bloginfo('template_directory'); ?>/lgfischer.js"></script>
+	<?php wp_head(); ?>
 </head>
 <body>
 	<header>
@@ -16,5 +17,6 @@
 			<?php foreach ( get_pages() as $page ) { ?>
 			<li><a href="<?php echo get_page_link( $page->ID )?>"><?php echo $page->post_title ?></a></li>
 			<?php } ?>
+			<?php wp_meta(); ?>
 		</ul>
 	</header>
