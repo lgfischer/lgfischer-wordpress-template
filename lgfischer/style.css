@@ -102,17 +102,14 @@ a:hover {
 pre, code {
 	font-family: monospace;
 	font-size: 15px;
-	white-space: pre;
+	background-color: #E8E8E8;
+	border-radius: 3px;
 }
 pre {
-	border-radius: 3px;
 	display: block;
+	white-space: pre-wrap;
 	line-height: 1.2em;
-	margin: 1em 0px;
-}
-code {
-	border-radius: 3px;
-	background-color: #E8E8E8;
+	border-color: #888;
 }
 header {
 	font-size: 15px;
@@ -161,6 +158,14 @@ article {
 	margin-bottom: 30px;
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
+}
+article ::-moz-selection {
+	background: #FF0;
+	color: black;
+}
+article ::selection {
+	background: #FF0;
+	color: black;
 }
 article > * {
 	margin-bottom: 15px;
