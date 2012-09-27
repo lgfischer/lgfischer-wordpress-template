@@ -41,9 +41,8 @@ I decided to write this one because I couldn't find anything on the web saying h
 <p>
 You start by creating two objects. The first is an <a href="http://developer.android.com/reference/android/appwidget/AppWidgetManager.html">AppWidgetManager</a>, which will give you the data you need about installed widgets. The second one is an <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHost.html">AppWidgetHost</a>, which will keep in memory your widget instances. Latter, your app will handle only the view that will draw the widget
 </p>
-<pre><code>
-    mAppWidgetManager = AppWidgetManager.getInstance(this);
-    mAppWidgetHost = new AppWidgetHost(this, R.id.APPWIDGET_HOST_ID);
+<pre><code>mAppWidgetManager = AppWidgetManager.getInstance(this);
+mAppWidgetHost = new AppWidgetHost(this, R.id.APPWIDGET_HOST_ID);
 </code></pre>
 
 <h2>Selecting the Widget</h2>
@@ -52,21 +51,15 @@ You start by creating two objects. The first is an <a href="http://developer.and
 You start by asking to the AppWidgetHost to allocate resources for a widget instance. It will return an ID for that. Then, you need to start an activity to let the user select which widget he wants to add to your app. You need to give this ID to the activity.
 </p>
 
-<pre><code>
-	void selectWidget() {
-	    int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
-	    Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
-	    pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-	    addEmptyData(pickIntent);
-	    startActivityForResult(pickIntent, R.id.REQUEST_PICK_APPWIDGET);
-	}
-	void addEmptyData(Intent pickIntent) {
-		ArrayList<AppWidgetProviderInfo> customInfo = new ArrayList<AppWidgetProviderInfo>();
-		pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_INFO, customInfo);
-		ArrayList<Bundle> customExtras = new ArrayList<Bundle>();
-		pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, customExtras);
-	};
-</code></pre>
+<pre><code>public void createWidget(Intent data) {
+    Bundle extras = data.getExtras();
+    int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+    AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+    AppWidgetHostView hostView = mAppWidgetHost.createView(this, appWidgetId, appWidgetInfo);
+    hostView.setAppWidget(appWidgetId, appWidgetInfo);
+    layout.addView(hostView);
+}</code></pre>
+
 
 <p>
 Unfortunately, any kind of software has bugs, and here is one of the Android SDK. The Widget API supports that you merge custom widgets of your application with the installed ones. But if you don't add anything, the Activity that shows the list of widgets to the user crashes with a NullPointerException. The <code>addEmptyData()</code> method above adds some dummy data to avoid this bug. More on this bug <a href="http://code.google.com/p/android/issues/detail?id=4272">here</a>. If you want to add a custom widget, start looking at <a href="https://github.com/android/platform_packages_apps_launcher/blob/eclair-sholes-release2/src/com/android/launcher/Launcher.java#L1990">this point of the AHSSC</a>.
@@ -79,38 +72,37 @@ If the user successfully selects a widget from the list (he didn't pressed "back
 </p>
 
 
-<pre></code>
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK ) {
-			if (requestCode == REQUEST_PICK_APPWIDGET) {
-				configureWidget(data);
-			}
-			else if (requestCode == REQUEST_CREATE_APPWIDGET) {
-				createWidget(data);
-			}
+<pre></code>@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	if (resultCode == RESULT_OK ) {
+		if (requestCode == REQUEST_PICK_APPWIDGET) {
+			configureWidget(data);
 		}
-		else if (resultCode == RESULT_CANCELED && data != null) {
-			int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-			if (appWidgetId != -1) {
-				mAppWidgetHost.deleteAppWidgetId(appWidgetId);
-			}
-		}
-	}
-
-	private void configureWidget(Intent data) {
-		Bundle extras = data.getExtras();
-		int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-		AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-		if (appWidgetInfo.configure != null) {
-			Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
-			intent.setComponent(appWidgetInfo.configure);
-			intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-			startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
-		} else {
+		else if (requestCode == REQUEST_CREATE_APPWIDGET) {
 			createWidget(data);
 		}
 	}
+	else if (resultCode == RESULT_CANCELED && data != null) {
+		int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+		if (appWidgetId != -1) {
+			mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+		}
+	}
+}
+
+private void configureWidget(Intent data) {
+	Bundle extras = data.getExtras();
+	int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+	AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+	if (appWidgetInfo.configure != null) {
+		Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+		intent.setComponent(appWidgetInfo.configure);
+		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+		startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
+	} else {
+		createWidget(data);
+	}
+}
 </code></pre>
 
 <h2>Creating and Adding it to Your Views</h2>
@@ -119,15 +111,14 @@ If the user successfully selects a widget from the list (he didn't pressed "back
 Now is time to create the widget itself. You will use the Widget ID and the AppWidgetProviderInfo to ask to the AppWidgetHost "<i>could you please create a view of this widget for me?</i>". It will return an <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHostView.html">AppWidgetHostView</a> which is a derived class from View. This one you can handle as any other view from the Framework. But don't forget to set the Widget ID and Widget Info on the view (I don't know why the AppWidgetHost didn't when creating the view).
 </p>
 
-<pre><code>
-	public void createWidget(Intent data) {
-		Bundle extras = data.getExtras();
-		int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-		AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-		AppWidgetHostView hostView = mAppWidgetHost.createView(this, appWidgetId, appWidgetInfo);
-		hostView.setAppWidget(appWidgetId, appWidgetInfo);
-		layout.addView(hostView);
-	}
+<pre><code>public void createWidget(Intent data) {
+	Bundle extras = data.getExtras();
+	int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+	AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+	AppWidgetHostView hostView = mAppWidgetHost.createView(this, appWidgetId, appWidgetInfo);
+	hostView.setAppWidget(appWidgetId, appWidgetInfo);
+	layout.addView(hostView);
+}
 </code></pre>
 
 <h2>Updating</h2>
@@ -136,17 +127,16 @@ Now is time to create the widget itself. You will use the Widget ID and the AppW
 The widget is now working, but is not being updated by your app. If the widget is a clock, it will be stuck at the time you added it. To register the widget to receive the events it needs, call <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHost.html#startListening%28%29">startListening()</a> on the AppWidgetHost. To avoid wasting battery with unnecessary updates while your app is not visible, call it during the <a href="http://developer.android.com/reference/android/app/Activity.html#onStart%28%29">onStart()</a> method of your activity, and call <a href="http://developer.android.com/reference/android/appwidget/AppWidgetHost.html#stopListening%28%29">stopListening()</a> during the <a href="http://developer.android.com/reference/android/app/Activity.html#onStop%28%29">onStop()</a> method.
 </p>
 
-<pre><code>
-	@Override
-	protected void onStart() {
-		super.onStart();
-		mAppWidgetHost.startListening();
-	}
-	@Override
-	protected void onStop() {
-		super.onStop();
-		mAppWidgetHost.stopListening();
-	}
+<pre><code>@Override
+protected void onStart() {
+	super.onStart();
+	mAppWidgetHost.startListening();
+}
+@Override
+protected void onStop() {
+	super.onStop();
+	mAppWidgetHost.stopListening();
+}
 </code></pre>
 
 <h2>Releasing the Widget</h2>
@@ -155,11 +145,10 @@ The widget is now working, but is not being updated by your app. If the widget i
 The widget should be working now. But if you want to remove the widget, you need to ask to the AppWidgetHost to release it. If you do not release it, you'll get a memory leak (your app will consume unnecessary memory). Finally, remove it from your LayoutView.
 </p>
 
-<pre><code>
-	public void removeWidget(AppWidgetHostView hostView) {
-		mAppWidgetHost.deleteAppWidgetId(hostView.getAppWidgetId());
-		layout.removeView(hostView);
-	}
+<pre><code>public void removeWidget(AppWidgetHostView hostView) {
+	mAppWidgetHost.deleteAppWidgetId(hostView.getAppWidgetId());
+	layout.removeView(hostView);
+}
 </code></pre>
 
 <p>
